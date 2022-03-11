@@ -104,6 +104,13 @@ def get_word_tfidf(text):
     >>> get_word_tfidf('Brutus is a honourable person')
     [('brutus', 0.8405129362379974), ('honourable', 0.4310718596448824), ('person', 0.32819971943754456)]
     """
+    tfidf = TfidVectorizer(input='content', stop_words='english')
+    data = [nltk.corpus.gutenberg.raw(c) for c in nltk.corpus.gutenberg]
+    tfidf.fit(data)
+    
+    result = tfidf.transform(text).toarray()
+    
+    
     return []
 
 
