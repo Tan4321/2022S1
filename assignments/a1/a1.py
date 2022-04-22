@@ -15,7 +15,18 @@ def count_pos(document, pos):
     >>> count_pos('austen-sense.txt', 'VERB')
     25074
     """
-    return 0
+    sen = [nltk.word_tokenize(s) for s in nltk.sent_tokenize(nltk.corpus.gutenberg.raw(document))]
+    tagged_sent = nltk.pos_tag_sents(sen, tagset='universal')
+    
+    count = 0
+    for s in  tagged_sent:
+        for x in s:
+            y = x[1]
+            if y == pos:
+                count+=1
+    
+    return count
+  
 
 # Task 2 (2 marks)
 def get_top_stem_bigrams(document, n):
@@ -27,7 +38,15 @@ def get_top_stem_bigrams(document, n):
     >>> get_top_stem_bigrams('austen-sense.txt',4)
     [(',', 'and'), ('.', "''"), (';', 'and'), (',', "''")]
     """
-    return []
+    sen = [nltk.word_tokenize(s) for s in nltk.sent_tokenize(nltk.corpus.gutenberg.raw(document))]
+    s = nltk.PorterStemmer()
+    stem = [[s.stem(w)for w in sent]for sent in sen]
+    
+    bigrams=[]
+    for x in stem:
+        bigrams += nltk.bigrams([p for p in x])
+    c=collections.Counter(bigrams)
+    return[b for b, f in c.most_common(n)]
 
 
 # Task 3 (2 marks)
@@ -40,7 +59,16 @@ def get_same_stem(document, word):
     >>> get_same_stem('austen-sense.txt','respect')[:5]
     [('respect', 22), ('respectability', 1), ('respectable', 14), ('respectably', 1), ('respected', 3)]
     """
-    return []
+    words= nltk.word_tokenize(nltk.corpus.gutenberg.raw(document))
+    ste=nltk.PorterStemmer()
+    st= ste.stem(word)
+    
+    stem_inv = []
+    for x in words:
+        if ste.stem(x) == st and (x,words.count(x)) not in stem_inv:
+            stem_inv.append((x, words.count(x)))
+    return sorted(stem_inv, key=lambda x:x[0])
+    
 
 # Task 4 (2 marks)
 def most_frequent_after_pos(document, pos):
@@ -52,7 +80,17 @@ def most_frequent_after_pos(document, pos):
     >>> most_frequent_after_pos('austen-sense.txt','NOUN')
     [(',', 5310)]
     """
-    return []
+    sen = [nltk.word_tokenize(s) for s in nltk.sent_tokenize(nltk.corpus.gutenberg.raw(document))]
+    tagged_sent = nltk.pos_tag_sents(sen, tagset='universal')
+    
+    most_fre= []
+    for x in tagged_sent:
+        bigram = nltk.bigrams(x)
+        most_fre += [m for (f,a),(m,t) in bigram if a == pos]
+    c=collections.Counter(most_fre)
+    
+    return [c.most_common(1)]
+    
 
 # Task 5 (2 marks)
 def get_word_tfidf(text):
@@ -66,6 +104,13 @@ def get_word_tfidf(text):
     >>> get_word_tfidf('Brutus is a honourable person')
     [('brutus', 0.8405129362379974), ('honourable', 0.4310718596448824), ('person', 0.32819971943754456)]
     """
+    tfidf = TfidVectorizer(input='content', stop_words='english')
+    data = [nltk.corpus.gutenberg.raw(c) for c in nltk.corpus.gutenberg]
+    tfidf.fit(data)
+    
+    result = tfidf.transform(text).toarray()
+    
+    
     return []
 
 
